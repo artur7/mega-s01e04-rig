@@ -3,8 +3,6 @@ import { loadConfig, type RigConfig } from './config.js';
 import { readNight } from './digest/reader.js';
 import type { ReadNightResult } from './digest/types.js';
 import { lane } from './lane.js';
-import { readNight } from './digest/reader.js';
-import type { ReadNightResult } from './digest/types.js';
 import { readStatus } from './status.js';
 import { DigestPage, MissingNight } from './views/digest.js';
 import { Layout } from './views/layout.js';
@@ -27,7 +25,7 @@ export function createApp(config: RigConfig = loadConfig()) {
       throw error;
     }
     if (result.missing) {
-      return c.json({ error: 'night not found', night }, 404);
+      return c.json(result, 404);
     }
     return c.json(result);
   });

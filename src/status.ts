@@ -24,13 +24,9 @@ export function countFinalStatuses(rows: DigestRow[]): NightCounts {
 }
 
 export function nightEntry(runsDir: string, night: string): NightEntry {
-  try {
-    const result = readNight(runsDir, night);
-    if (result.missing) return { night, counts: null };
-    return { night, counts: countFinalStatuses(result.rows) };
-  } catch {
-    return { night, counts: null };
-  }
+  const result = readNight(runsDir, night);
+  if (result.missing) return { night, counts: null };
+  return { night, counts: countFinalStatuses(result.rows) };
 }
 
 // Nights on disk = runs/<YYYY-MM-DD>.jsonl, newest first.
