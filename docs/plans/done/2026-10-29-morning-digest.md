@@ -1,8 +1,9 @@
 ---
 plan: morning-digest
-status: ready
+status: done
 owner: rook
 opened: 2026-10-29
+closed: 2026-10-29
 ---
 
 # Morning digest
@@ -77,3 +78,34 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Completed issues and outcomes
+
+| Issue | Outcome |
+|-------|---------|
+| [#1](https://github.com/artur7/mega-s01e04-rig/issues/1) | Run log reader and shared digest contract completed; sample reader tests pass with five jobs and one bad line. |
+| [#2](https://github.com/artur7/mega-s01e04-rig/issues/2) | Server-rendered digest page completed, including sorting, warnings, missing nights and empty nights. |
+| [#3](https://github.com/artur7/mega-s01e04-rig/issues/3) | JSON digest route completed using the same rows and ordering as the page. |
+| [#4](https://github.com/artur7/mega-s01e04-rig/issues/4) | Status board links both sample nights to their digests with status counts. |
+| [#5](https://github.com/artur7/mega-s01e04-rig/issues/5) | Digest route tests completed for success, missing, empty and malformed-line nights. |
+| [#6](https://github.com/artur7/mega-s01e04-rig/issues/6) | Marked preview and issue links submitted; the reviewer confirmed viewing the preview before cleanup. |
+| [#7](https://github.com/artur7/mega-s01e04-rig/issues/7) | Human-approved unmarked replacement verified at the same public URL; old marked artifact deleted and this plan archived. Issue closure waits for the archive commit to be pushed. |
+
+### Review and cleanup record · 2026-10-29
+
+- Review completion is recorded in [the #6 closing comment](https://github.com/artur7/mega-s01e04-rig/issues/6#issuecomment-6498041839):
+  the reviewer has seen the marked preview. The human explicitly approved its unmarked
+  replacement and deletion of the old marked artifact after that confirmation.
+- [Unmarked workflow run 40882660332](https://github.com/artur7/mega-s01e04-rig/actions/runs/40882660332)
+  succeeded with `marked=false`. Its capture step unsets `LANE_MARKER`, tests and typechecks
+  the app, and saves the digest again before deployment.
+- The public preview remains at https://artur7.github.io/mega-s01e04-rig/. Both the normal
+  URL and a cache-busted fetch returned HTTP 200 with `no marker set`, all five sorted sample
+  jobs, inline CSS and no scripts or external assets. The exact private lane marker and its
+  HTML-escaped form were absent from both responses; the public marker has been removed.
+- New unmarked `github-pages` artifact: `12901276656` (retained; not deleted).
+- Previous marked run: `40878994489`. Only its marked artifact `12899856149` was deleted;
+  a subsequent artifact lookup returned HTTP 404.
+- No preview HTML, `.env`, token or lane marker was added to git. The archive commit must
+  be integrated and pushed before #7 is closed; the course answer keeps the same repository
+  and preview URLs.
