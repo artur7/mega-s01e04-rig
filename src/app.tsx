@@ -3,6 +3,8 @@ import { loadConfig, type RigConfig } from './config.js';
 import { readNight } from './digest/reader.js';
 import type { ReadNightResult } from './digest/types.js';
 import { lane } from './lane.js';
+import { readNight } from './digest/reader.js';
+import type { ReadNightResult } from './digest/types.js';
 import { readStatus } from './status.js';
 import { DigestPage, MissingNight } from './views/digest.js';
 import { Layout } from './views/layout.js';
@@ -12,6 +14,23 @@ export function createApp(config: RigConfig = loadConfig()) {
   const app = new Hono();
 
   app.get('/health', (c) => c.json({ ok: true, lane: lane().id }));
+
+  app.get('/api/digest/:night', (c) => {
+    const night = c.req.param('night');
+    let result: ReadNightResult;
+    try {
+      result = readNight(config.runsDir, night);
+    } catch (error) {
+      if (error instanceof RangeError) {
+        return c.json({ error: 'invalid night', night, message: error.message }, 400);
+      }
+      throw error;
+    }
+    if (result.missing) {
+      return c.json({ error: 'night not found', night }, 404);
+    }
+    return c.json(result);
+  });
 
   app.get('/', (c) =>
     c.html(
