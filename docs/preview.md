@@ -56,7 +56,8 @@ Use that actual HTTPS URL (normally `https://artur7.github.io/mega-s01e04-rig/`)
 artifact download URL. Open the complete page and send the reviewer that URL with the plan's
 issue links #1–#5 above, [#6](https://github.com/artur7/mega-s01e04-rig/issues/6), and
 [#7](https://github.com/artur7/mega-s01e04-rig/issues/7).
-Only after submission and all issue #6 done conditions hold may #6 be closed.
+Submission is not review completion. Keep #6 open until the course confirms that
+the reviewer has actually inspected the marked preview. Only then may #6 be closed.
 
 ## After review: unmarked replacement at the same URL
 
