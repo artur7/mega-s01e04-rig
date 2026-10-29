@@ -4,3 +4,4 @@ var/
 *.png
 .claude/skills
 test/.digest-tmp-*/
+.preview/

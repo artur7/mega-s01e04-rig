@@ -10,3 +10,6 @@ pnpm dev               # http://localhost:8787
 ```
 
 Working on it with an agent: start at [AGENTS.md](AGENTS.md).
+
+Static digest review copies: [preview operations](docs/preview.md). Publication requires
+separate approval; preparing the dispatch-only workflow does not publish anything.

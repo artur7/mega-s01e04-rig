@@ -1,0 +1,92 @@
+name: Digest preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      marked:
+        description: Publish the lane marker (requires separate human publication approval)
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digest-preview-pages
+  cancel-in-progress: false
+
+jobs:
+  capture:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      artifact_id: ${{ steps.upload.outputs.artifact_id }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Install locked dependencies
+        run: npx --yes pnpm@12.15.0 install --frozen-lockfile
+      - name: Test, typecheck, and capture the digest
+        env:
+          PREVIEW_MARKED: ${{ inputs.marked }}
+          LANE_MARKER: ${{ inputs.marked && secrets.LANE_MARKER || '' }}
+        run: bash scripts/capture-preview.sh
+      - name: Upload only the single HTML file
+        id: upload
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .preview/site
+          retention-days: 1
+      - name: Record artifact for later deletion
+        env:
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact_id }}
+          MARKED: ${{ inputs.marked }}
+        run: |
+          {
+            printf '### Digest preview artifact\n'
+            printf -- '- Run ID: `%s`\n' "$GITHUB_RUN_ID"
+            printf -- '- Artifact ID: `%s`\n' "$ARTIFACT_ID"
+            printf -- '- Marked: `%s`\n' "$MARKED"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove runner copy
+        if: always()
+        run: rm -f .preview/site/index.html
+
+  deploy:
+    needs: capture
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+      artifact_id: ${{ needs.capture.outputs.artifact_id }}
+    steps:
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: false
+      - name: Deploy single-file preview
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Record deployment URL and artifact
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+          ARTIFACT_ID: ${{ needs.capture.outputs.artifact_id }}
+        run: |
+          {
+            printf '### Digest preview deployment\n'
+            printf -- '- URL: %s\n' "$PAGE_URL"
+            printf -- '- Run ID: `%s`\n' "$GITHUB_RUN_ID"
+            printf -- '- Artifact ID: `%s`\n' "$ARTIFACT_ID"
+          } >> "$GITHUB_STEP_SUMMARY"
